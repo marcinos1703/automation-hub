@@ -1,5 +1,6 @@
 const express = require('express');
-const fs = require('fs').promises;
+const fs = require('fs');
+const fsp = fs.promises;
 const path = require('path');
 const { createLogger, format, transports } = require('winston');
 
@@ -10,6 +11,8 @@ const DATA_FILE = path.join(__dirname, 'data', 'logs.json');
 const LOG_DIR = path.join(__dirname, 'logs');
 const LOG_FILE = path.join(LOG_DIR, 'app.log');
 
+fs.mkdirSync(LOG_DIR, { recursive: true });
+
 const logger = createLogger({
   level: 'info',
   format: format.combine(format.timestamp(), format.json()),
@@ -18,20 +21,20 @@ const logger = createLogger({
 
 async function ensureDataFile() {
   try {
-    await fs.access(DATA_FILE);
+    await fsp.access(DATA_FILE);
   } catch (err) {
-    await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
-    await fs.writeFile(DATA_FILE, '[]', 'utf8');
+    await fsp.mkdir(path.dirname(DATA_FILE), { recursive: true });
+    await fsp.writeFile(DATA_FILE, '[]', 'utf8');
   }
 }
 
 async function ensureLogDir() {
-  await fs.mkdir(LOG_DIR, { recursive: true });
+  await fsp.mkdir(LOG_DIR, { recursive: true });
 }
 
 async function readLogs() {
   try {
-    const content = await fs.readFile(DATA_FILE, 'utf8');
+    const content = await fsp.readFile(DATA_FILE, 'utf8');
     return JSON.parse(content || '[]');
   } catch (err) {
     if (err.code === 'ENOENT') {
@@ -43,7 +46,7 @@ async function readLogs() {
 }
 
 async function writeLogs(logs) {
-  await fs.writeFile(DATA_FILE, JSON.stringify(logs, null, 2), 'utf8');
+  await fsp.writeFile(DATA_FILE, JSON.stringify(logs, null, 2), 'utf8');
 }
 
 app.use(express.json());

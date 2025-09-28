@@ -1,0 +1,16 @@
+{
+  "name": "automation-hub",
+  "version": "1.0.0",
+  "description": "Baza pod logi, Google Drive, OpenAI, Gemini, agenty",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "*",
+    "winston": "*",
+    "googleapis": "*",
+    "openai": "*",
+    "@google/generative-ai": "*"
+  }
+}

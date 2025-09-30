@@ -2,22 +2,19 @@ const express = require('express');
 const fs = require('fs');
 const fsp = fs.promises;
 const path = require('path');
-const { createLogger, format, transports } = require('winston');
+const logger = require('./src/services/logger');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 const DATA_FILE = path.join(__dirname, 'data', 'logs.json');
-const LOG_DIR = path.join(__dirname, 'logs');
-const LOG_FILE = path.join(LOG_DIR, 'app.log');
 
-fs.mkdirSync(LOG_DIR, { recursive: true });
 
-const logger = createLogger({
-  level: 'info',
-  format: format.combine(format.timestamp(), format.json()),
-  transports: [new transports.File({ filename: LOG_FILE })],
-});
+
+
+
+
 
 async function ensureDataFile() {
   try {
@@ -28,9 +25,7 @@ async function ensureDataFile() {
   }
 }
 
-async function ensureLogDir() {
-  await fsp.mkdir(LOG_DIR, { recursive: true });
-}
+
 
 async function readLogs() {
   try {
@@ -77,9 +72,10 @@ app.post('/log', async (req, res) => {
     message: message.trim(),
   };
 
+
   try {
-    await ensureDataFile();
-    await ensureLogDir();
+    
+    
     const logs = await readLogs();
     logs.push(entry);
     await writeLogs(logs);
@@ -92,7 +88,7 @@ app.post('/log', async (req, res) => {
 
 async function startServer() {
   try {
-    await ensureLogDir();
+    
     await ensureDataFile();
     app.listen(PORT, () => {
       logger.info(`Server started on port ${PORT}`);
